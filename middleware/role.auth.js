@@ -6,18 +6,25 @@ function roleAuthenticatToken(roles) {
         try {
             const authHeader = req.headers.authorization;
             const token = authHeader && authHeader.split(' ')[1];
-            if (token == null) {
-                res.sendStatus(401);
+            if (!token) {
+                return res.status(403).json({ message: 'User not autorized' });
             }
             jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
                 if (err) throw new Error('invalid token');
-                if(!user.role === roles){
-                    return`You don't have access`;
+                let hasRole = false;
+                const role = user.role;
+                role.forEach(item => {
+                    if (roles.includes(item)) {
+                        hasRole = true;
+                    }
+                })
+                if (!hasRole) {
+                    return res.status(403).json({message : 'You dont have an access'});
                 }
                 next();
             });
         } catch (err) {
-            res.sendStatus(403);
+            res.status(403).json({ message: 'User not autorized' });
         }
     }
 }

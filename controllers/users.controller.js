@@ -35,9 +35,11 @@ class UsersControllers {
         if (!validPassword) {
             return `${password} is not right `;
         }
+        const role = user.roles;
         const token = jwt.sign({
             id: user._id,
-            user: user.username
+            user: user.username,
+            role : role
         }, process.env.ACCESS_TOKEN_SECRET);
         return `${token}`;
     }

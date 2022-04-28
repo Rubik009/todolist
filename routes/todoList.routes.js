@@ -93,7 +93,7 @@ router.post("/create", async (req, res) => {
 /**
  * @swagger
  * /api/todo/edit/{name}:
- *  put:
+ *  patch:
  *      description: Edit task in the list
  *      tags:
  *        - Tasks
@@ -101,7 +101,7 @@ router.post("/create", async (req, res) => {
  *        - application/json
  *      parameters:
  *        - in: path
- *          name: author
+ *          name: name
  *          requered: true
  *          scheme: 
  *              type: string
