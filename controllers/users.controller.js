@@ -1,5 +1,4 @@
 const User = require('../models/users.model');
-const Role = require('../models/roles.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
@@ -13,15 +12,13 @@ class UsersControllers {
         if (!errors.isEmpty()) {
             return 'Errors on registration';
         }
-        const { username, password, role } = body;
+        const {_id, username, password } = body;
         const candidate = await User.findOne({ username });
         if (candidate) {
             return `User with this ${username} already exist`;
         }
         const hashPassword = await bcrypt.hash(password, saltRound);
-        const userRole = new Role({ value: role });
-        await userRole.save();
-        const user = new User({ username, password: hashPassword, roles: [userRole.value] });
+        const user = new User({ _id, username, password: hashPassword});
         await user.save();
         return `User added`;
     }
@@ -35,11 +32,9 @@ class UsersControllers {
         if (!validPassword) {
             return `${password} is not right `;
         }
-        const role = user.roles;
         const token = jwt.sign({
             id: user._id,
-            user: user.username,
-            role : role
+            user: user.username
         }, process.env.ACCESS_TOKEN_SECRET);
         return `${token}`;
     }

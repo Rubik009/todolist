@@ -1,28 +1,29 @@
+const { default: mongoose } = require('mongoose');
 const TodoList = require('../models/todoList.model');
-
 class ToDoListController {
     async getTasks() {
         const tasks = await TodoList.find();
         return tasks;
     }
-    async getTaskByName(name) {
-        const task = await TodoList.findOne({ author: name });
+    async getTaskById(id) {
+        const task = await TodoList.find({ user_id: id });
         return task;
     }
-    async addTask(name, taskMessage) {
+    async addTask(id, name, taskMessage) {
         const task = new TodoList({
-            author: name,
-            text: taskMessage,
+            user_id: id,
+            title: name,
+            content: taskMessage,
         })
         const savedTasks = task.save();
         return savedTasks;
     }
-    async deleteTask(name) {
-        const task = await TodoList.deleteOne({ author: name });
+    async deleteTask(id, title) {
+        const task = await TodoList.deleteOne({ user_id: id, title: title });
         return task;
     }
-    async editTask(name, taskMessage){
-        const task = await TodoList.updateOne({ author: name }, { $set: { text: taskMessage } });
+    async editTask(id, title, taskMessage) {
+        const task = await TodoList.updateOne({ user_id: id, title: title }, { $set: { content: taskMessage } });
         return task;
     }
 }

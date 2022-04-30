@@ -3,9 +3,6 @@ const router = express.Router();
 const UsersControllers = require('../controllers/users.controller');
 const ToDoListController = require('../controllers/todoList.controller');
 const { check } = require('express-validator');
-const authenticatToken = require('../middleware/auth');
-const roleAuthenticatToken = require('../middleware/role.auth');
-
 
 /**
  * @swagger
@@ -41,14 +38,9 @@ const roleAuthenticatToken = require('../middleware/role.auth');
  *         type: string
  *         example: 'alesia'
  *         description: user password
- *       role:
- *         type: string
- *         example: 'admin'
- *         description: user role 
  *     required:
  *      - username
  *      - password
- *      - role
  */
 router.post("/register", [
     check('username', 'username should not be empty').notEmpty(),
@@ -91,11 +83,11 @@ router.post("/register", [
  *     properties:
  *       username:
  *         type: string
- *         example: roma
+ *         example: roman
  *         description: user login
  *       password:
  *         type: string
- *         example: 'roma'
+ *         example: 'roman'
  *         description: user password 
  *     required:
  *      - username
@@ -110,29 +102,5 @@ router.post('/login', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /api/user/todos:
- *  get:
- *      description: Use this URL to see all tasks
- *      tags:
- *          - Users
- *      parameters:
- *        - name: authorization
- *          in: header
- *          type: string
- *          required: true
- *      responses:
- *          '200':
- *              description: Успешный ответ
- */
-router.get("/todos", roleAuthenticatToken('admin'), async (req, res) => {
-    try {
-        const tasks = await ToDoListController.getTasks();
-        res.status(200).json({ message: 'List of tasks', tasks });
-    } catch (err) {
-        console.log({ message: 'user is not autorized' })
-    }
-});
 
 module.exports = router;

@@ -1,13 +1,17 @@
 const mongoose = require('mongoose');
 
 const todoListSchema = mongoose.Schema({
-    author :  {
-        type : String,
-        require : true,
+    user_id: {
+        type: Number,
+        ref: 'user'
     },
-    text : {
-        type : String,
-        require : true,
+    title: {
+        type: String,
+        require: true,
+    },
+    content: {
+        type: String,
+        require: true,
     }
 })
 

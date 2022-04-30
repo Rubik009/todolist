@@ -1,49 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const TodoList = require('../models/todoList.model');
-const ToDoListController = require('../controllers/todoList.controller')
+const authenticatToken = require('../middleware/auth');
+const ToDoListController = require('../controllers/todoList.controller');
+
 
 /**
  * @swagger
- * /api/todo:
+ * /api/todo/tasks:
  *  get:
- *      description: Use a request to get list of tasks
- *      tags:
- *          - Tasks
- *      responses:
- *          '200':
- *              description: A succesful response
- */
-router.get("/", async (req, res) => {
-    try {
-        const tasks = await ToDoListController.getTasks();
-        res.status(200).json({message : 'List of tasks:',tasks});
-    } catch (err) {
-        console.log({ message: err })
-    }
-});
-
-/**
- * @swagger
- * /api/todo/byName/{name}:
- *  get:
- *      description: Use a request to get task by name
+ *      description: Use a request to get task of autorized user
  *      tags:
  *        - Tasks
  *      parameters:
- *        - in: path
- *          name: name
- *          requered: true
- *          scheme: 
- *              type: string
+ *      - name : authorization
+ *        in : header
+ *        type : string
+ *        required : true 
  *      responses:
  *          '200':
  *              description: A succesful response
  */
-router.get("/byName/:name", async (req, res) => {
+router.get("/tasks", authenticatToken, async (req, res) => {
     try {
-        const task = await ToDoListController.getTaskByName(req.params.name);
-        res.status(200).json({message: `Task of ${req.params.name}`,task});
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        const decodedtoken = JSON.parse(atob(token.split('.')[1]))
+        const task = await ToDoListController.getTaskById(decodedtoken.id);
+        res.status(200).json({ message: `Tasks of ${decodedtoken.user}`, task });
     } catch (err) {
         console.log({ message: err })
     }
@@ -59,6 +42,10 @@ router.get("/byName/:name", async (req, res) => {
  *      consumes:
  *        - application/json
  *      parameters:
+ *        - name : authorization
+ *          in : header
+ *          type : string
+ *          required : true 
  *        - in: body
  *          name: Task
  *          required: true
@@ -72,18 +59,24 @@ router.get("/byName/:name", async (req, res) => {
  *  Task:
  *      type: object
  *      required:
- *          - author
- *          - text
+ *          - user_id
+ *          - title
+ *          - content
  *      properties:
- *          author: 
+ *          user_id: 
  *              type: string
- *          text: 
+ *          title: 
+ *              type: string
+ *          content: 
  *              type: string
  */
-router.post("/create", async (req, res) => {
+router.post("/create", authenticatToken, async (req, res) => {
     try {
-        const savedTasks = await ToDoListController.addTask(req.body.author, req.body.text);
-        res.status(200).json({message : 'Task added!',savedTasks});
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        const decodedtoken = JSON.parse(atob(token.split('.')[1]))
+        const savedTasks = await ToDoListController.addTask(decodedtoken.id, req.body.title, req.body.content);
+        res.status(200).json({ message: 'Task added!', savedTasks });
 
     } catch (err) {
         console.log({ message: err })
@@ -92,7 +85,7 @@ router.post("/create", async (req, res) => {
 
 /**
  * @swagger
- * /api/todo/edit/{name}:
+ * /api/todo/edit:
  *  patch:
  *      description: Edit task in the list
  *      tags:
@@ -100,16 +93,14 @@ router.post("/create", async (req, res) => {
  *      consumes:
  *        - application/json
  *      parameters:
- *        - in: path
- *          name: name
- *          requered: true
- *          scheme: 
- *              type: string
- *          description: write name of author of task need to change
+ *        - name : authorization
+ *          in : header
+ *          type : string
+ *          required : true 
  *        - in: body
  *          name: Task
- *          requered: true
- *          description: Object to change 
+ *          required: true
+ *          description: write title of task need to change anf content to put instead of previous one
  *          schema:
  *              $ref: '#/definitions/Task'
  *      responses:
@@ -119,15 +110,21 @@ router.post("/create", async (req, res) => {
  *  Task:
  *      type: object
  *      required:
- *          - text
+ *          - title
+ *          - content
  *      properties:
- *          text: 
+ *          title: 
  *              type: string
- */ 
-router.patch("/edit/:name", async (req, res) => {
+ *          content: 
+ *              type: string
+ */
+router.patch("/edit", authenticatToken, async (req, res) => {
     try {
-        const task = await ToDoListController.editTask(req.params.name, req.body.text)
-        res.status(200).json({message : `Task of ${req.params.name} edited`,task});
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        const decodedtoken = JSON.parse(atob(token.split('.')[1]));
+        const task = await ToDoListController.editTask(decodedtoken.id,req.body.title, req.body.content)
+        res.status(200).json({ message: `Task of ${decodedtoken.user} edited`, task });
     } catch (err) {
         console.log({ message: err });
     }
@@ -136,28 +133,43 @@ router.patch("/edit/:name", async (req, res) => {
 
 /**
  * @swagger
- * /api/todo/deleteByName/{name}:
+ * /api/todo/delete:
  *  delete:
- *      description: Delete task from list
+ *      description: Delete task of the user
  *      tags:
  *        - Tasks
  *      consumes:
  *        - application/json
  *      parameters:
-*        - in: path
- *          name: name
- *          requered: true
- *          scheme: 
- *              type: string
- *          description: put name of person task need to delete
+ *        - name : authorization
+ *          in : header
+ *          type : string
+ *          required : true 
+ *        - in: body
+ *          name: Task
+ *          required: true
+ *          description: write title of task need to change anf content to put instead of previous one
+ *          schema:
+ *              $ref: '#/definitions/Task'
  *      responses:
  *          '200':
  *              description: A succesful response
- */ 
-router.delete("/deleteByName/:name", async (req, res) => {
+ * definitions:
+ *  Task:
+ *      type: object
+ *      required:
+ *          - title
+ *      properties:
+ *          title: 
+ *              type: string
+ */
+router.delete("/delete", authenticatToken, async (req, res) => {
     try {
-        const task = await ToDoListController.deleteTask(req.params.name)
-        res.status(200).json({message : `Task of ${req.params.name} deleted!`,task});
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        const decodedtoken = JSON.parse(atob(token.split('.')[1]));
+        const task = await ToDoListController.deleteTask(req.body.title)
+        res.status(200).json({ message: `Task of ${decodedtoken.user} deleted!`, task });
     } catch (err) {
         console.log({ message: err })
     }

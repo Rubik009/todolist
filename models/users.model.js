@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const UsersSchema = mongoose.Schema({
+    _id: {
+        type : Number,
+        require : true
+    },
     username :  {
         type : String,
         require : true,
@@ -9,10 +13,6 @@ const UsersSchema = mongoose.Schema({
         type : String,
         require : true,
     },
-    roles : [{
-        type : String,
-        ref : 'Role'
-    }]
 })
 
 module.exports = mongoose.model('user', UsersSchema);
