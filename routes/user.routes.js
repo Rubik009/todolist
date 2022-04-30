@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const UsersControllers = require('../controllers/users.controller');
-const ToDoListController = require('../controllers/todoList.controller');
 const { check } = require('express-validator');
 
 /**
@@ -30,6 +29,10 @@ const { check } = require('express-validator');
  *   User:
  *     description: User object
  *     properties:
+ *       _id:
+ *         type: string
+ *         example : 4
+ *         description : user id
  *       username:
  *         type: string
  *         example: alesia
