@@ -12,13 +12,13 @@ class UsersControllers {
         if (!errors.isEmpty()) {
             return 'Errors on registration';
         }
-        const {_id, username, password } = body;
+        const {username, password } = body;
         const candidate = await User.findOne({ username });
         if (candidate) {
             return `User with this ${username} already exist`;
         }
         const hashPassword = await bcrypt.hash(password, saltRound);
-        const user = new User({ _id, username, password: hashPassword});
+        const user = new User({username, password: hashPassword});
         await user.save();
         return `User added`;
     }

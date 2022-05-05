@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const todoListSchema = mongoose.Schema({
     user_id: {
-        type: Number,
+        type: String,
         ref: 'user'
     },
     title: {

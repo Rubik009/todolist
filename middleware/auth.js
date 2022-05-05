@@ -14,7 +14,7 @@ const authenticatToken = (req, res, next) => {
             next();
         });
     } catch (err) {
-        res.res.status(403).json({ message: 'User not autorized' });
+        res.status(403).json({ message: 'User not autorized' });
     }
 }
 

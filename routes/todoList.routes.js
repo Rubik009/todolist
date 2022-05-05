@@ -75,6 +75,7 @@ router.post("/create", authenticatToken, async (req, res) => {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]))
+        console.log(decodedtoken.id);
         const savedTasks = await ToDoListController.addTask(decodedtoken.id, req.body.title, req.body.content);
         res.status(200).json({ message: 'Task added!', savedTasks });
 
