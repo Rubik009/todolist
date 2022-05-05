@@ -60,20 +60,19 @@ router.get("/tasks", authenticatToken, async (req, res) => {
  *      type: object
  *      required:
  *          - title
- *          - content
+ *          - isCompleted
  *      properties:
  *          title: 
  *              type: string
- *          content: 
- *              type: string
+ *          isCompleted: 
+ *              type: boolean
  */
 router.post("/create", authenticatToken, async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]))
-        console.log(decodedtoken.id);
-        const savedTasks = await ToDoListController.addTask(decodedtoken.id, req.body.title, req.body.content);
+        const savedTasks = await ToDoListController.addTask(decodedtoken.id, req.body.title, req.body.isCompleted);
         res.status(200).json({ message: 'Task added!', savedTasks });
 
     } catch (err) {
@@ -83,7 +82,7 @@ router.post("/create", authenticatToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/todo/edit:
+ * /api/todo/edit/{title}:
  *  patch:
  *      description: Edit task in the list
  *      tags:
@@ -94,6 +93,9 @@ router.post("/create", authenticatToken, async (req, res) => {
  *        - name : authorization
  *          in : header
  *          type : string
+ *          required : true
+ *        - in : path
+ *          name : title
  *          required : true 
  *        - in: body
  *          name: Task
@@ -108,20 +110,17 @@ router.post("/create", authenticatToken, async (req, res) => {
  *  Task:
  *      type: object
  *      required:
- *          - title
- *          - content
+ *          - isCompleted
  *      properties:
- *          title: 
- *              type: string
- *          content: 
- *              type: string
+ *          isCompleted: 
+ *              type: boolean
  */
-router.patch("/edit", authenticatToken, async (req, res) => {
+router.patch("/edit/:title", authenticatToken, async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
-        const task = await ToDoListController.editTask(decodedtoken.id,req.body.title, req.body.content)
+        const task = await ToDoListController.editTask(decodedtoken.id,req.params.title, req.body.isCompleted)
         res.status(200).json({ message: `Task of ${decodedtoken.user} edited`, task });
     } catch (err) {
         console.log({ message: err });
@@ -131,7 +130,7 @@ router.patch("/edit", authenticatToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/todo/delete:
+ * /api/todo/delete/{title}:
  *  delete:
  *      description: Delete task of the user
  *      tags:
@@ -142,7 +141,10 @@ router.patch("/edit", authenticatToken, async (req, res) => {
  *        - name : authorization
  *          in : header
  *          type : string
- *          required : true 
+ *          required : true
+ *        - in : path
+ *          name : title
+ *          required : true  
  *        - in: body
  *          name: Task
  *          required: true
@@ -161,12 +163,12 @@ router.patch("/edit", authenticatToken, async (req, res) => {
  *          title: 
  *              type: string
  */
-router.delete("/delete", authenticatToken, async (req, res) => {
+router.delete("/delete/:title", authenticatToken, async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
-        const task = await ToDoListController.deleteTask(decodedtoken.id,req.body.title)
+        const task = await ToDoListController.deleteTask(decodedtoken.id,req.params.title)
         res.status(200).json({ message: `Task of ${decodedtoken.user} deleted!`, task });
     } catch (err) {
         console.log({ message: err })

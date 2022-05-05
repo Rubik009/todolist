@@ -9,11 +9,11 @@ class ToDoListController {
         const task = await TodoList.find({ user_id: id });
         return task;
     }
-    async addTask(id, name, taskMessage) {
+    async addTask(id, title, isCompleted) {
         const task = new TodoList({
             user_id: id,
-            title: name,
-            content: taskMessage,
+            title: title,
+            isCompleted: isCompleted,
         })
         const savedTasks = task.save();
         return savedTasks;
@@ -22,8 +22,8 @@ class ToDoListController {
         const task = await TodoList.deleteOne({ user_id: id, title: title });
         return task;
     }
-    async editTask(id, title, taskMessage) {
-        const task = await TodoList.updateOne({ user_id: id, title: title }, { $set: { content: taskMessage } });
+    async editTask(id, title, isCompleted) {
+        const task = await TodoList.updateOne({ user_id: id, title: title }, { $set: { isCompleted: isCompleted } });
         return task;
     }
 }

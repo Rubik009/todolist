@@ -9,8 +9,8 @@ const todoListSchema = mongoose.Schema({
         type: String,
         require: true,
     },
-    content: {
-        type: String,
+    isCompleted: {
+        type: Boolean,
         require: true,
     }
 })
