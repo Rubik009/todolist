@@ -166,7 +166,7 @@ router.delete("/delete", authenticatToken, async (req, res) => {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
-        const task = await ToDoListController.deleteTask(req.body.title)
+        const task = await ToDoListController.deleteTask(decodedtoken.id,req.body.title)
         res.status(200).json({ message: `Task of ${decodedtoken.user} deleted!`, task });
     } catch (err) {
         console.log({ message: err })
