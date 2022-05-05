@@ -29,10 +29,6 @@ const { check } = require('express-validator');
  *   User:
  *     description: User object
  *     properties:
- *       _id:
- *         type: string
- *         example : 4
- *         description : user id
  *       username:
  *         type: string
  *         example: alesia

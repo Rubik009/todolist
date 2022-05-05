@@ -59,12 +59,9 @@ router.get("/tasks", authenticatToken, async (req, res) => {
  *  Task:
  *      type: object
  *      required:
- *          - user_id
  *          - title
  *          - content
  *      properties:
- *          user_id: 
- *              type: string
  *          title: 
  *              type: string
  *          content: 
