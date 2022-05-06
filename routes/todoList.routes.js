@@ -82,7 +82,7 @@ router.post("/create", authenticatToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/todo/edit/{title}:
+ * /api/todo/edit/{id}:
  *  patch:
  *      description: Edit task in the list
  *      tags:
@@ -95,7 +95,8 @@ router.post("/create", authenticatToken, async (req, res) => {
  *          type : string
  *          required : true
  *        - in : path
- *          name : title
+ *          name : id
+ *          type : string
  *          required : true 
  *        - in: body
  *          name: edit_Task
@@ -110,17 +111,20 @@ router.post("/create", authenticatToken, async (req, res) => {
  *  edit_Task:
  *      type: object
  *      required:
+ *          - title
  *          - isCompleted
  *      properties:
+ *          title:
+ *              type : string
  *          isCompleted: 
  *              type: boolean
  */
-router.patch("/edit/:title", authenticatToken, async (req, res) => {
+router.patch("/edit/:id", authenticatToken, async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
-        const task = await ToDoListController.editTask(decodedtoken.id,req.params.title, req.body.isCompleted)
+        const task = await ToDoListController.editTask(decodedtoken.id,req.params.id,req.body.title, req.body.isCompleted)
         res.status(200).json({ message: `Task of ${decodedtoken.user} edited`, task });
     } catch (err) {
         console.log({ message: err });
@@ -130,7 +134,7 @@ router.patch("/edit/:title", authenticatToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/todo/delete/{title}:
+ * /api/todo/delete/{id}:
  *  delete:
  *      description: Delete task of the user
  *      tags:
@@ -143,18 +147,18 @@ router.patch("/edit/:title", authenticatToken, async (req, res) => {
  *          type : string
  *          required : true
  *        - in : path
- *          name : title
+ *          name : id
  *          required : true  
  *      responses:
  *          '200':
  *              description: A succesful response
  */
-router.delete("/delete/:title", authenticatToken, async (req, res) => {
+router.delete("/delete/:id", authenticatToken, async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
-        const task = await ToDoListController.deleteTask(decodedtoken.id,req.params.title)
+        const task = await ToDoListController.deleteTask(decodedtoken.id,req.params.id)
         res.status(200).json({ message: `Task of ${decodedtoken.user} deleted!`, task });
     } catch (err) {
         console.log({ message: err })

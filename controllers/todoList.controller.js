@@ -18,12 +18,12 @@ class ToDoListController {
         const savedTasks = task.save();
         return savedTasks;
     }
-    async deleteTask(id, title) {
-        const task = await TodoList.deleteOne({ user_id: id, title: title });
+    async deleteTask(id, todo_id) {
+        const task = await TodoList.deleteOne({ user_id: id, _id: todo_id });
         return task;
     }
-    async editTask(id, title, isCompleted) {
-        const task = await TodoList.updateOne({ user_id: id, title: title }, { $set: { isCompleted: isCompleted } });
+    async editTask(id,todo_id, title, isCompleted) {
+        const task = await TodoList.updateOne({ _id : todo_id, user_id: id  }, { $set: { title: title, isCompleted: isCompleted } });
         return task;
     }
 }
