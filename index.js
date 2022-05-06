@@ -28,8 +28,8 @@ app.use(bodyParser.json())
 const routes = require("./routes/index");
 app.use("/api", routes);
 
-mongoose.connect(process.env.DB_CONNECTION_PORT, () => console.log('Connected to MongoDB'));
 const server = app.listen(process.env.PORT, () => console.log('Server started'));
+const db = mongoose.connect(process.env.DB_CONNECTION_PORT, () => console.log('Connected to MongoDB'));
 
 
-module.exports = server;
+module.exports = server, db;

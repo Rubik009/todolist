@@ -98,16 +98,16 @@ router.post("/create", authenticatToken, async (req, res) => {
  *          name : title
  *          required : true 
  *        - in: body
- *          name: Task
+ *          name: edit_Task
  *          required: true
  *          description: write title of task need to change anf content to put instead of previous one
  *          schema:
- *              $ref: '#/definitions/Task'
+ *              $ref: '#/definitions/edit_Task'
  *      responses:
  *          '200':
  *              description: A succesful response
  * definitions:
- *  Task:
+ *  edit_Task:
  *      type: object
  *      required:
  *          - isCompleted
@@ -145,23 +145,9 @@ router.patch("/edit/:title", authenticatToken, async (req, res) => {
  *        - in : path
  *          name : title
  *          required : true  
- *        - in: body
- *          name: Task
- *          required: true
- *          description: write title of task need to change anf content to put instead of previous one
- *          schema:
- *              $ref: '#/definitions/Task'
  *      responses:
  *          '200':
  *              description: A succesful response
- * definitions:
- *  Task:
- *      type: object
- *      required:
- *          - title
- *      properties:
- *          title: 
- *              type: string
  */
 router.delete("/delete/:title", authenticatToken, async (req, res) => {
     try {

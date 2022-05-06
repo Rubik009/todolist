@@ -1,7 +1,8 @@
 let chai = require('chai');
 let chaiHttp = require('chai-http');
-let request = require('supertest')
-let server = require('../index')
+let request = require('supertest');
+let server = require('../index');
+const TodoList = require('../models/todoList.model');
 
 chai.should();
 
