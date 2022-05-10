@@ -124,7 +124,11 @@ router.patch("/edit/:id", authenticatToken, async (req, res) => {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
-        const task = await ToDoListController.editTask(decodedtoken.id,req.params.id,req.body.title, req.body.isCompleted)
+        const task = await ToDoListController.editTask(decodedtoken.id, req.params.id, req.body.title, req.body.isCompleted);
+        if(task.matchedCount === 0){
+            res.status(400).json({ message: `This task id - ${req.params.id} doesn't exist` });
+            return;
+        }
         res.status(200).json({ message: `Task of ${decodedtoken.user} edited`, task });
     } catch (err) {
         console.log({ message: err });
@@ -158,7 +162,11 @@ router.delete("/delete/:id", authenticatToken, async (req, res) => {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
-        const task = await ToDoListController.deleteTask(decodedtoken.id,req.params.id)
+        const task = await ToDoListController.deleteTask(decodedtoken.id, req.params.id);
+        if (task.deletedCount === 0) {
+            res.status(400).json({ message: `This task id - ${req.params.id} doesn't exist` });
+            return;
+        }
         res.status(200).json({ message: `Task of ${decodedtoken.user} deleted!`, task });
     } catch (err) {
         console.log({ message: err })
