@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authenticatToken = require('../middleware/auth');
 const ToDoListController = require('../controllers/todoList.controller');
+const { default: mongoose } = require("mongoose");
 
 
 /**
@@ -107,6 +108,8 @@ router.post("/create", authenticatToken, async (req, res) => {
  *      responses:
  *          '200':
  *              description: A succesful response
+ *          '400':
+ *              description: problems with task_id
  * definitions:
  *  edit_Task:
  *      type: object
@@ -125,7 +128,11 @@ router.patch("/edit/:id", authenticatToken, async (req, res) => {
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
         const task = await ToDoListController.editTask(decodedtoken.id, req.params.id, req.body.title, req.body.isCompleted);
-        if(task.matchedCount === 0){
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            res.status(400).json({ message: `This task id - ${req.params.id} is wrong format` });
+            return;
+        }
+        if (task.matchedCount === 0) {
             res.status(400).json({ message: `This task id - ${req.params.id} doesn't exist` });
             return;
         }
@@ -151,17 +158,24 @@ router.patch("/edit/:id", authenticatToken, async (req, res) => {
  *          type : string
  *          required : true
  *        - in : path
+ *          type : string
  *          name : id
  *          required : true  
  *      responses:
  *          '200':
  *              description: A succesful response
+ *          '400' :
+ *              description: problems with task_id
  */
 router.delete("/delete/:id", authenticatToken, async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
         const decodedtoken = JSON.parse(atob(token.split('.')[1]));
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            res.status(400).json({ message: `This task id - ${req.params.id} is wrong format` });
+            return;
+        }
         const task = await ToDoListController.deleteTask(decodedtoken.id, req.params.id);
         if (task.deletedCount === 0) {
             res.status(400).json({ message: `This task id - ${req.params.id} doesn't exist` });
